@@ -11,3 +11,10 @@
 * Funçao Maximizar e restrições
 * Multiplas variáveis de decisão
 * Apresentação do resultado
+
+## Instruções para execução
+1. Em um terminal como adminstrador entre na pasta em que deseja baixar os arquivos
+2. Com git instalado execute:
+> git clone 
+3. Execute o arquivo **index.html** no navegador preferido
+4. _Enjoy!_
