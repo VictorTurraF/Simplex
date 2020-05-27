@@ -16,5 +16,5 @@
 1. Em um terminal como adminstrador entre na pasta em que deseja baixar os arquivos
 2. Com git instalado execute:
 > git clone https://github.com/VictorTurraF/Simplex.git
-3. Execute o arquivo **index.html** no navegador preferido
+3. Execute o arquivo **index.html** em seu navegador preferido
 4. _Enjoy!_
