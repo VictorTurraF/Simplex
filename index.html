@@ -1,0 +1,100 @@
+<html>
+
+    <head>
+        <title>Simplex</title>
+        <meta charset="UTF-8" />
+        <style>
+            input[type="number"]{
+              max-width: 100px;
+            }
+            
+            .nothing {
+              border: 0;
+              outline: none;
+            }
+            
+/*            [data-folga]:last-of-type{
+              background-color: #000;
+            }*/
+            
+        </style>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" />
+    </head>
+
+    <body>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Linha</th>
+                    <th>Base</th>
+                    <th class="" data-var="1">x1</th>
+                    <th class="lst-var" data-var="2">x2</th>
+                    <th class="" data-folga="1">f1</th>
+                    <th class="" data-folga="2">f2</th>
+                    <th class="" data-folga="3">f3</th><th class="lst" data-folga="4">f4</th>
+                    <th>b</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-row="1" class="">
+                    <td>1</td>
+                    <td>f1</td>
+                    <td class="" data-var="1"><input type="number" step="any" value="1"></td>
+                    <td class="lst-var" data-var="2"><input type="number" step="any" value="0"></td>
+                    <td class="" data-folga="1"><input class="form-control" type="number" max="1" min="-1" value="1"></td>
+                    <td class="" data-folga="2"><input class="form-control" type="number" max="1" min="-1" value="0"></td>
+                    <td class="" data-folga="3"><input class="form-control" type="number" max="1" min="-1" value="0"></td><td class="lst" data-folga="4"><input type="number" max="1" min="-1" value="0"></td>
+                    <td><input type="number" value="4"></td>
+                </tr>
+                <tr data-row="2" class="">
+                    <td>2</td>
+                    <td data-row="2">f2</td>
+                    <td class="" data-var="1"><input type="number" step="any" value="0"></td>
+                    <td class="lst-var" data-var="2"><input type="number" step="any" value="1"></td>
+                    <td class="" data-folga="1"><input type="number" max="1" min="-1" value="0"></td>
+                    <td class="" data-folga="2"><input type="number" max="1" min="-1" value="1"></td>
+                    <td class="" data-folga="3"><input type="number" max="1" min="-1" value="0"></td><td class="lst" data-folga="4"><input type="number" max="1" min="-1" value="0"></td>
+                    <td><input type="number" value="6"></td>
+                </tr>
+                <tr data-row="3" class="">
+                    <td>3</td>
+                    <td data-row="3">f3</td>
+                    <td class="" data-var="1"><input type="number" step="any" value="3"></td>
+                    <td class="lst-var" data-var="2"><input type="number" step="any" value="2"></td>
+                    <td class="" data-folga="1"><input type="number" max="1" min="-1" value="0"></td>
+                    <td class="" data-folga="2"><input type="number" max="1" min="-1" value="0"></td>
+                    <td class="" data-folga="3"><input type="number" max="1" min="-1" value="1"></td><td class="lst" data-folga="4"><input type="number" max="1" min="-1" value="1"></td>
+                    <td><input type="number" value="18"></td>
+                </tr><tr data-row="4" class="last-row">
+                    <td>4</td>
+                    <td data-row="4">f4</td>
+                    <td class="" data-var="1"><input type="number" step="any" value="3"></td>
+                    <td class="lst-var" data-var="2"><input type="number" step="any" value="2"></td>
+                    <td class="" data-folga="1"><input type="number" max="1" min="-1" value="0"></td>
+                    <td class="" data-folga="2"><input type="number" max="1" min="-1" value="0"></td>
+                    <td class="" data-folga="3"><input type="number" max="1" min="-1" value="1"></td><td class="lst" data-folga="4"><input type="number" max="1" min="-1" value="1"></td>
+                    <td><input type="number" value="18"></td>
+                </tr>
+                <tr class="z">
+                    <td>#</td>
+                    <td>Z</td>
+                    <td class="" data-var="1"><input type="number" step="any" value="-3"></td>
+                    <td class="lst-var" data-var="2"><input type="number" step="any" value="-5"></td>
+                    <td class="" data-folga="1"><input type="number" value="0" disabled=""></td>
+                    <td class="" data-folga="2"><input type="number" value="0" disabled=""></td>
+                    <td class="" data-folga="3"><input type="number" value="0" disabled=""></td><td class="lst" data-folga="4"><input type="number" value="0" disabled=""></td>
+                    <td><input type="number" value="0" disabled=""></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="mt-3">
+            <button id="btnAddRow" class="btn btn-secondary">Adicionar restrição</button>
+            <button id="btnAddVar" class="btn btn-secondary">Adicionar variável</button>
+            <button id="btnCalc" class="btn btn-primary">Calcular Simplex</button>
+        </div>
+        <script type="text/javascript" src="index.js"></script>
+    </body>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+</html>
