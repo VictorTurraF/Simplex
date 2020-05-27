@@ -149,6 +149,27 @@
       return r;
     }
 
+    function gerarTabelaResultado( ctx, table ){
+      let thead = document.createElement('thead')
+      let tbody = document.createElement('tbody')
+      table.forEach(function(linha){
+        let tr = document.createElement('tr');
+        for( var i in linha ){
+          let td = document.createElement('td')
+          if(['Linha', 'Base'].includes(i)){
+            td.innerText = linha[i]
+          }else{
+            td.innerText = linha[i].toFixed(3)
+          }
+          tr.appendChild(td);
+        }
+        tbody.appendChild(tr);
+      })
+      ctx.appendChild(tbody)
+      ctx.classList.remove('d-none');
+      document.getElementById('r33').classList.remove('d-none')
+    }
+
     var btnAddRow = document.getElementById('btnAddRow');
     var btnAddVar = document.getElementById('btnAddVar');
     var btnCalc = document.getElementById('btnCalc');
@@ -261,8 +282,8 @@
         cont ++;
       }
 
+      gerarTabelaResultado( document.getElementById('result'), table );
 
-      
     });
 
 }());
