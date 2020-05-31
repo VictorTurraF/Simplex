@@ -152,6 +152,7 @@
     function gerarTabelaResultado( ctx, table ){
       let thead = document.createElement('thead')
       let tbody = document.createElement('tbody')
+      thead.appendChild( document.getElementById('headerSimplex').cloneNode(true) )
       table.forEach(function(linha){
         let tr = document.createElement('tr');
         for( var i in linha ){
@@ -159,15 +160,41 @@
           if(['Linha', 'Base'].includes(i)){
             td.innerText = linha[i]
           }else{
-            td.innerText = linha[i].toFixed(3)
+            td.innerText = linha[i] % 1 != 0 ? linha[i].toFixed(3) : linha[i]
           }
           tr.appendChild(td);
         }
         tbody.appendChild(tr);
       })
+      ctx.appendChild(thead)
       ctx.appendChild(tbody)
       ctx.classList.remove('d-none');
       document.getElementById('r33').classList.remove('d-none')
+      let resp = []
+      Array.prototype.forEach.call( thead.rows.headerSimplex.cells, cel => {
+        if(![0, 1].includes(cel.cellIndex)){
+          resp.push([ cel.textContent, 0]);
+        }
+      })
+      table.forEach( linha => {
+        resp.forEach( resplinha => {
+          if(resplinha[0] == linha.Base){
+            resplinha[1] = linha.b
+          }
+        })
+        if( linha.Base == 'Z' ){
+          resp.push( [ linha.Base, linha.b ] )
+        }
+      })
+      // console.log(resp);
+      let p = document.createElement('h2')
+      p.innerText = "Variáveis"
+      ctx.parentNode.appendChild(p)
+      resp.forEach( r => {
+        let p = document.createElement('p')
+        p.innerText = r[0] + " = " + r[1]
+        ctx.parentNode.appendChild(p)
+      })
     }
 
     var btnAddRow = document.getElementById('btnAddRow');
