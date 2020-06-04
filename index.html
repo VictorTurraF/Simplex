@@ -4,7 +4,7 @@
         <title>Simplex</title>
         <meta charset="UTF-8" />
         <style>
-            input[type="number"]{
+            input{
               max-width: 100px;
             }
             
@@ -27,7 +27,7 @@
             <table class="table mt-3">
                 <thead>
                     <tr id="headerSimplex">
-                        <th>Linha</th>
+                        <!-- <th>Linha</th> -->
                         <th>Base</th>
                         <th class="" data-var="1">x1</th>
                         <th class="lst-var" data-var="2">x2</th>
@@ -39,8 +39,8 @@
                 </thead>
                 <tbody>
                     <tr data-row="1" class="">
-                        <td>1</td>
-                        <td>f1</td>
+                        <!-- <td>1</td> -->
+                        <td><input class="form-control" type="text" value="f1" /></td>
                         <td class="" data-var="1"><input class="form-control" type="number" step="any" value="1"></td>
                         <td class="lst-var" data-var="2"><input class="form-control" type="number" step="any" value="0"></td>
                         <td class="" data-folga="1"><input class="form-control" type="number" max="1" min="-1" value="1"></td>
@@ -49,8 +49,8 @@
                         <td><input class="form-control" type="number" value="4"></td>
                     </tr>
                     <tr data-row="2" class="last-row">
-                        <td>2</td>
-                        <td data-row="2">f2</td>
+                        <!-- <td>2</td> -->
+                        <td data-row="2"><input class="form-control" type="text" value="f2" /></td>
                         <td class="" data-var="1"><input class="form-control" type="number" step="any" value="0"></td>
                         <td class="lst-var" data-var="2"><input class="form-control" type="number" step="any" value="1"></td>
                         <td class="" data-folga="1"><input class="form-control" type="number" max="1" min="-1" value="0"></td>
@@ -69,8 +69,8 @@
                         <td><input type="number" value="18"></td>
                     </tr> -->
                     <tr class="z">
-                        <td>#</td>
-                        <td>Z</td>
+                        <!-- <td>#</td> -->
+                        <td><input class="form-control" type="text" value="Z" /></td>
                         <td class="" data-var="1"><input class="form-control" type="number" step="any" value="-3"></td>
                         <td class="lst-var" data-var="2"><input class="form-control" type="number" step="any" value="-5"></td>
                         <td class="" data-folga="1"><input class="form-control" type="number" value="0" disabled=""></td>
@@ -84,6 +84,7 @@
                 <button id="btnAddRow" class="btn btn-secondary">Adicionar restrição</button>
                 <button id="btnAddVar" class="btn btn-secondary">Adicionar variável</button>
                 <button id="btnCalc" class="btn btn-primary">Calcular Simplex</button>
+                <button id="btnCalc2" class="btn btn-primary">Calcular Simplex2</button>
             </div>
             <h2 class="mt-3 d-none" id="r33">Resultado</h2>
             <table class="table d-none mt-3" id="result">
