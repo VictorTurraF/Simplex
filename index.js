@@ -135,9 +135,9 @@
     var r = last.cloneNode(true)
     last.classList.remove('last-row')
     r.dataset.row = num
-    r.cells[0].textContent = num
-    r.cells[1].dataset.row = num
-    r.cells[1].textContent = 'f' + num
+    // r.cells[0].textContent = num
+    r.cells[0].dataset.row = num
+    r.cells[0].querySelector('input').value = 'f' + num
     
 //      Array.prototype.forEach.call( r.cells, function(c){
 //        if( typeof( c.dataset.folga ) !== 'undefined' )
@@ -352,6 +352,15 @@
     })
     return menor;
   }
+  function minPositiveAssoc( array ){
+    menor = [ 'notFound', Infinity ];
+    array.forEach( e => {
+      if(e[0] != 'Base')
+        if(e[1] < menor[1] && e[1] > -1 )
+          menor = e
+    })
+    return menor;
+  }
   function searchWithinRowByKey( row, key ){
     let keys = getArrayKeys( row );
     let found = keys.findIndex( el => el == key )
@@ -409,13 +418,14 @@
    */
   function v2_quemSai( entra, t ){
     // Obtem o indice da coluna
-    var col = entra[0];
+    var col = entra[0]
     // Calcula os quocientes
-    var quocientes = calcQuocientes( t, col );
+    var quocientes = calcQuocientes( t, col )
     // Ordena os quocientes (primeiros as folgas depois variaveis de decisão)
     var quocientes = orderQuotients( quocientes )
-    // Busca o menor positivo
     console.log(quocientes)
+    // Retorna o menor positivo
+    return minPositiveAssoc( quocientes )
   }
 
   /**********************************************************************************
@@ -426,13 +436,16 @@
     // Gera tabela na forma de Array
     var tabela = DOMGerarTabela();
     console.log(tabela)
-
     // Obtem da tabela o elemento que vai entrar na base
     var entra = v2_quemEntra( tabela );
-    console.log(entra)
+    // console.log("Entra: ", entra)
     // Obtem da tabela o elemento que vai sair da base
     var pivo = v2_quemSai( entra, tabela );
+    // console.log("Sai: ", pivo)
+    // Caso não encontre que sai 
+    if( pivo[0] == 'notFound' ) // break;
 
+    // 
   }
 
 }());
