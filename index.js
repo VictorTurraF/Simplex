@@ -1,5 +1,8 @@
 (function(){
 
+  var form = document.getElementById('simplex_form')
+  var simplex = document.getElementById('simplex')
+  var btnNovoSimplex = document.getElementById('btnNovoSimplex')
   // Parte do Check
   document.addEventListener('DOMContentLoaded', e => {
     let tabela = document.getElementById('formaPadraoSimplex')
@@ -8,7 +11,9 @@
     if( htmltabela != null ){
       tabela.innerHTML = htmltabela
       attachInputListeners();
-      document.getElementById('btnCalc2').classList.remove('d-none')
+      // document.getElementById('btnCalc2').classList.remove('d-none')
+      form.classList.add('d-none')
+      simplex.classList.remove('d-none')
     }
 
     let check = document.getElementById('simplexSaveCheck')
@@ -20,7 +25,14 @@
       else
         localStorage.removeItem('tabela')
     })
+
+    btnNovoSimplex.addEventListener('click', e => {
+      localStorage.removeItem('tabela')
+      document.location.reload(true);
+    })
+
   })
+
 //   // Funcao para retornar o menor valor de um array
 //   Array.min_assoc = function(array) {
 //     var menor = array[0].value;
@@ -340,42 +352,32 @@
     e.preventDefault()
     let variaveis = Number(document.getElementById('qtdVariaveis').value)
     let restricoes = Number(document.getElementById('qtdRestricoes').value)
-    let tabela = []
-    v3_gerarTabelaDOM( variaveis, restricoes, tabela )
-    document.getElementById('btnCalc2').classList.remove('d-none')
-    // Se checada guarda a tabela
-    let check = document.getElementById('simplexSaveCheck')
-    if( check.checked )
-      localStorage.setItem('tabela', document.getElementById('formaPadraoSimplex').innerHTML )
-    else
-      localStorage.removeItem('tabela')
 
-    attachInputListeners();
+    if( [variaveis, restricoes].find( el => el < 1 ) === undefined ){
+      let tabela = []
+      
+      let check = document.getElementById('simplexSaveCheck')
+
+      v3_gerarTabelaDOM( variaveis, restricoes, tabela )
+      // document.getElementById('btnCalc2').classList.remove('d-none')
+      
+      form.classList.add('d-none')
+      simplex.classList.remove('d-none')
+      // Se checada guarda a tabela
+      if( check.checked )
+        localStorage.setItem('tabela', document.getElementById('formaPadraoSimplex').innerHTML )
+      else
+        localStorage.removeItem('tabela')
+  
+      attachInputListeners();
+    }else{
+      alert('Informe valores válidos para gerar o Simplex')
+    }
+
     
   })
-  function inserirCampos( base, vars, rest, row ){
-    let basecell = row.insertCell(-1)
-    let inputbase = document.createElement('input')
-    inputbase.value = base;
-    inputbase.setAttribute('value', base)
-    inputbase.disabled = true
-    inputbase.classList.add('form-control')
-    basecell.appendChild( inputbase )
-    // console.log(vars + rest)
-    for(  let v = 0; v < (vars + rest); v++){
-      let variavel = row.insertCell(-1)
-      let input = document.createElement('input')
-      // pege o valor na tabela
-      input.type = 'number'
-      input.classList.add('form-control')
-      variavel.appendChild(input)
-    }
-    let b = row.insertCell(-1)
-    let inputb = document.createElement('input')
-    inputb.classList.add('form-control')
-    inputb.type = 'number'
-    b.appendChild(inputb)
-  }
+
+  
 
   function v3_gerarTabelaDOM( vars, rest, t ){
     var tabela = document.getElementById('formaPadraoSimplex')
@@ -409,5 +411,28 @@
     inserirCampos( fostr, vars, rest, fo )
   }
   
+  function inserirCampos( base, vars, rest, row ){
+    let basecell = row.insertCell(-1)
+    let inputbase = document.createElement('input')
+    inputbase.value = base;
+    inputbase.setAttribute('value', base)
+    inputbase.disabled = true
+    inputbase.classList.add('form-control')
+    basecell.appendChild( inputbase )
+    // console.log(vars + rest)
+    for(  let v = 0; v < (vars + rest); v++){
+      let variavel = row.insertCell(-1)
+      let input = document.createElement('input')
+      // pege o valor na tabela
+      input.type = 'number'
+      input.classList.add('form-control')
+      variavel.appendChild(input)
+    }
+    let b = row.insertCell(-1)
+    let inputb = document.createElement('input')
+    inputb.classList.add('form-control')
+    inputb.type = 'number'
+    b.appendChild(inputb)
+  }
 
 }());

@@ -1,4 +1,12 @@
 (function(){
+
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+  })
+
+  /**
+   * Encontra o a tabela DOM e itera para gerar o simplex na forma de Array
+   */
   function v3_DOMGerarTabela(){
     let table = [];
     let rows = document.querySelectorAll('tbody tr');
@@ -23,6 +31,101 @@
     return table;
   }
 
+  /**
+   * Insere os resultados da analise na tabela
+   * @param {Array} t_sens Resultado da analise de sensibilidade
+   */
+  function inserirValoresAnalise( t_sens ){
+    let tbody = document.getElementById('anl_sens_result')
+    t_sens.forEach( linha => {
+      let linhatr = document.createElement('tr')
+      linha.forEach( coluna => {
+        let coltd = document.createElement('td')
+        coltd.appendChild( document.createTextNode( coluna ) )
+        linhatr.appendChild( coltd )
+      })
+      tbody.appendChild(linhatr)
+    })
+  }
+
+  /**
+   * Realiza a analise de Sensibilidade
+   * @param {Array} t_inicial Quadro Inicial
+   * @param {Array} t_final Quadro Final
+   */
+  function analiseDeSensibilidade( t_inicial, t_final ){
+    let t_sens = []
+    let vars_inicial = new Map( relacionarVariaveisResultado(t_inicial))
+    let vars_final = new Map( relacionarVariaveisResultado(t_final))
+    let linhaFO = t_final[t_final.length - 1].get('Variaveis')
+    console.log(vars_inicial)
+    console.log(vars_final)
+    for( let [key, value] of vars_inicial ){
+      let linha = []
+      let final_value = vars_final.get(key)
+      final_value = final_value % 1 != 0 ? Number( final_value.toFixed(2) ) : final_value  
+      let init_value = value % 1 != 0 ? Number( value.toFixed(2)) : value
+      let is_f = key.indexOf('f') == 0 ? true : false
+      let is_x = key.indexOf('x') == 0 ? true : false
+      let precosombra = linhaFO.get(key);
+      precosombra = precosombra % 1 != 0 && precosombra ? Number( precosombra.toFixed(2) ) : precosombra
+      linha[0] = key,
+      linha[1] = init_value,
+      linha[2] = final_value
+      linha[3] = is_f ? ( final_value == 0 ? 'Sim' : 'Não' ) : '-'
+      linha[4] = final_value == 0 ? 'Não' : 'Sim'
+      linha[5] = is_f ? 'Folga' : ( is_x ? 'Decisão' : 'Função Objetivo' )
+      linha[6] = is_f ? final_value : '-'
+      linha[7] = is_f ? ( init_value - final_value ) : '-'
+      linha[8] = is_f && precosombra ? precosombra : '-'
+      linha[9] = is_x ? precosombra : '-'
+      let quos = is_f ? v3_calcQuocientes( t_final, key ) : null
+      let quos_neg = is_f ? v3_calcQuocientes( t_final, key ).map( q => { q[1] *= -1; return q }) : null
+      let min_pos = is_f ? minPositiveAssocArray( quos_neg ) : null
+      let max_neg = is_f ? minPositiveAssocArray( quos ) : null
+      linha[10] = is_f ? Number( min_pos[1].toFixed(2) ) : '-'
+      linha[11] = is_f ? Number( max_neg[1].toFixed(2) ): '-'
+      linha[12] = is_f ? init_value + Number( min_pos[1].toFixed(2) ) : '-'
+      linha[13] = is_f ? init_value - Number( max_neg[1].toFixed(2) ) : '-'
+      t_sens.push( linha )
+    }
+    inserirValoresAnalise( t_sens )
+    document.getElementById('anl_sens').classList.remove('d-none')
+  }
+
+  /**
+   * Realiza a relação de todas as variaveis do modelo,
+   * informando os respectivos valores em b ou zero para os que
+   * não estão na base
+   * @param {Array} tabela Tabela do simplex 
+   * @returns {Array} Lista com as variaveis associadas ao seu valor
+   */
+  function relacionarVariaveisResultado( tabela ){
+    let resp = []
+    for( let [key, value] of tabela[0].get('Variaveis') ){
+      if( key != 'b' ){
+        let resplinha = [ key, 0 ]
+        // console.log(resplinha)
+        tabela.forEach( linha => {
+          if( linha.get('Base') == key ){
+            resplinha[1] = linha.get('Variaveis').get('b')
+          }
+        })
+        resp.push(resplinha)
+      }
+    }
+    linhaz = tabela[tabela.length - 1]
+    var foz = document.getElementById('tipoSolução').value
+    var fostr = foz == -1 ? linhaz.get("Base").replace( '-', '') : linhaz.get("Base")
+    resp.push( [ fostr, linhaz.get('Variaveis').get('b') * foz ] )
+    return resp;
+  }
+
+  /**
+   * Função que gera a tabela e HTML apartir da tabela do
+   * Simplex na forma de Array e mapas
+   * @param {Array} t tabela do simplex 
+   */
   function gerarQuadro( t ){
     let table = document.createElement('table')
     let thead = document.createElement('thead')
@@ -43,10 +146,43 @@
     })
     table.appendChild(thead);
     table.appendChild(tbody);
-    table.classList.add('table')
+    table.classList.add('table', 'table-bordered')
     return table
   }
 
+  /**
+   * Gera a tabela de interpretação economica dos resultados,
+   * pode ser usada a cada iteração ou no resultado final
+   * @param {Array} resp Array associativo das variaveis e seus resultados
+   */
+  function gerarInterpretacao( resp ){
+    let table = document.createElement('table')
+    let thead = document.createElement('thead')
+    let tbody = document.createElement('tbody')
+    thead.innerHTML = "<tr><th>Variavel</th><th>Valor</th></tr>";
+    resp.forEach( linha => {
+      let linhatr = document.createElement('tr')
+      linha.forEach( coluna => {
+        let coltd = document.createElement('td')
+        coltd.appendChild( document.createTextNode( coluna ) )
+        linhatr.appendChild( coltd )
+      })
+      tbody.appendChild(linhatr)
+    })
+    table.appendChild(thead)
+    table.appendChild(tbody)
+    table.classList.add('table', 'table-bordered')
+    let caption = document.createElement('caption')
+    caption.appendChild(document.createTextNode('Interpretação econômica dos resultados'))
+    table.appendChild(caption)
+    return table
+  }
+
+  /**
+   * Responsável por inserir as iterações e 
+   * @param {Array} tabela tabela do simplex
+   * @param {Integer} cont Contador das iterações 
+   */
   function inserirIteracao( tabela, cont ){
     htmltable = gerarQuadro(tabela)
     const iteracoesdiv = document.getElementById('iteracoes')
@@ -55,46 +191,34 @@
     etapa.appendChild( document.createTextNode('Iteração n. ' + cont) )
     iteracoesdiv.appendChild(etapa)
     iteracoesdiv.appendChild(htmltable)
-
-    let resp = []
-    for( let [key, value] of tabela[0].get('Variaveis') ){
-      if( key != 'b' ){
-        let resplinha = [ key, 0 ]
-        // console.log(resplinha)
-        tabela.forEach( linha => {
-          if( linha.get('Base') == key ){
-            resplinha[1] = linha.get('Variaveis').get('b')
-          }
-        })
-        resp.push(resplinha)
-      }
-    }
-    linhaz = tabela[tabela.length - 1]
-
-    var foz = document.getElementById('tipoSolução').value
-
-    var fostr = foz == -1 ? linhaz.get("Base").replace( '-', '') : linhaz.get("Base")
-
-    resp.push( [ fostr, linhaz.get('Variaveis').get('b') * foz ] )
+    let resp = relacionarVariaveisResultado(tabela)
     
-    let p = document.createElement('h2')
-    p.innerText = "Variáveis"
-    iteracoesdiv.appendChild(p)
-    let pvars = document.createElement('p')
-    resp.forEach( (r, i) => {
-      pvars.appendChild( document.createTextNode(r[0] + " = " + r[1]))
-      if(i != resp.length - 1 )
-        pvars.appendChild( document.createTextNode(', '))
-      else
-        pvars.appendChild( document.createTextNode('.'))
-    })
-    iteracoesdiv.appendChild(pvars)
   }
-
   function showTable(t){
     for( let value of t )
       console.log(value);
   }
+
+  /**
+   * Usada para montar solução direta quando solicitado
+   * @param {Array} tabela Tabela do simplex
+   */
+  function solucao( tabela, msg ){
+    const iteracoesdiv = document.getElementById('iteracoes')
+    htmltable = gerarQuadro(tabela)
+    let resp = relacionarVariaveisResultado(tabela)
+    let interpretacao = gerarInterpretacao( resp )
+    let title = document.createElement('h3')
+    title.innerText = msg
+    iteracoesdiv.appendChild(title)
+    iteracoesdiv.appendChild(htmltable)
+    iteracoesdiv.appendChild(interpretacao)
+  }
+
+  /**
+   * Usada para encontrar o menor valor para sair da Base
+   * @param {Map} row Linha a qual se deseja verificar
+   */
   function minRow(row){
     let variaveis = row.get('Variaveis')
     let menor = [...variaveis][0]
@@ -104,6 +228,13 @@
     }
     return menor;
   }
+
+  /**
+   * Usada para econtrar o menor quociente positivo em um array,
+   * essa função é especifica para o Array retornado pela função
+   * que calcula os cocientes do simplex
+   * @param {Array} row  
+   */
   function minPositiveAssocArray(row){
     let menor = [ 'notFound', Infinity ]
     row.forEach( quo => { 
@@ -113,6 +244,15 @@
     return menor
   }
 
+  /**
+   * Gera o resultado das divisões de uma determinada coluna do simplex
+   * relacionando cada valor ao valor correspondente na coluna de B
+   * Util para:
+   *  * definir quem sai da base, e
+   *  * encontar os valores para o calculo de variação de restriçoes
+   * @param {Array} t Tabela do simplex 
+   * @param {String} col String usada como chave para referenciar a coluna  
+   */
   function v3_calcQuocientes(t, col){
     let quo = [];
     let table = t.slice(0, t.length - 1) // Remove a linha de z
@@ -165,7 +305,6 @@
     // Calcula os quocientes
     var quocientes = v3_calcQuocientes( t, col )
     // Retorna o menor positivo
-    console.log(quocientes)
     return minPositiveAssocArray( quocientes )
   }
 
@@ -217,35 +356,59 @@
     })
   }
 
+  function solucaoImpossivel( tabela ){
+    let item = tabela.find( linha => linha.get('Variaveis').get('b') < 0 )
+    return item == undefined ? false : true;
+  }
 
+  var st_table;
+  var rst_table;
   /**********************************************************************************
    * Logica 3 - Simplex Main
    *********************************************************************************/
   document.getElementById('btnCalc2').addEventListener('click', Main );
   function Main(){
+
+    // Checks passo a passo ou solução direta
+    let passoapasso = document.getElementById('forma_rst_1').checked
+    let direta = document.getElementById('forma_rst_2').checked
+    // Contador de iterações
     var cont = 1
     // Gera tabela na forma de Array
     var tabela = v3_DOMGerarTabela();
-    console.log(tabela)
-    // Enquanto não encontrar a sulução executa uma iteração
-    while( !v3_solucaoEncontrada(tabela) ){
-      // Obtem da tabela o elemento que vai entrar na base
-      var entra = v3_quemEntra( tabela ); console.log("Entra: ", entra)
-      // Obtem da tabela o elemento que vai sair da base
-      var sai = v3_quemSai( tabela, entra ); console.log("Sai: ", sai)
-      // Caso não encontre quem sai 
-      if( sai[0] == 'notFound' ) { console.log("Solução não encontrada"); break};
-      // Calcula a nova linha do pivô passando quem entra e sai da base
-      var linha_pivo = v3_calcularLinhaPivo( tabela, sai, entra )
-      // Calculas as demais linhas da tabela passando a linha do pivo e a coluna do mesmo
-      v3_calcularDemaisLinhas( tabela, linha_pivo, entra )
-      // Gera o quadro da Iteração
-      inserirIteracao( tabela , cont )
-      // Conta as iterações
-      // if( cont == 1 ) break;
-      cont ++;
-    }
-    console.log(tabela)
+    // Salva a tabela inicial
+    st_table = _.cloneDeep(tabela)
+    // Verifica se há solução
+    if( !solucaoImpossivel( tabela ) ){
+      // Enquanto não encontrar a sulução executa uma iteração
+      while( !v3_solucaoEncontrada(tabela) ){
+        // Obtem da tabela o elemento que vai entrar na base
+        var entra = v3_quemEntra( tabela ); //console.log("Entra: ", entra)
+        // Obtem da tabela o elemento que vai sair da base
+        var sai = v3_quemSai( tabela, entra ); //console.log("Sai: ", sai)
+        // Caso não encontre quem sai 
+        if( sai[0] == 'notFound' ) { 
+          alert("Solução não encontrada, não é possivel definir quem sai da base"); 
+          break;
+        };
+        // Calcula a nova linha do pivô passando quem entra e sai da base
+        var linha_pivo = v3_calcularLinhaPivo( tabela, sai, entra )
+        // Calculas as demais linhas da tabela passando a linha do pivo e a coluna do mesmo
+        v3_calcularDemaisLinhas( tabela, linha_pivo, entra )
+        // Gera o quadro da Iteração
+        if( passoapasso ) solucao( tabela , 'Iteração: ' + cont )
+        // Conta as iterações
+        cont ++;
+      }
+      // Salva a tabela final
+      rst_table = _.cloneDeep( tabela )
+      // Caso seja solução direta
+      if( direta) solucao( tabela, "Solução Direta" )
+      // Faz a analise de sensibilidade
+      analiseDeSensibilidade( st_table, rst_table )
+    } else // Caso n tenha solução
+      alert('Não é possivel encontrar solução para o modelo informado')
+
   }
 
 }())
