@@ -179,27 +179,6 @@
   }
 
   /**
-   * Responsável por inserir as iterações e 
-   * @param {Array} tabela tabela do simplex
-   * @param {Integer} cont Contador das iterações 
-   */
-  function inserirIteracao( tabela, cont ){
-    htmltable = gerarQuadro(tabela)
-    const iteracoesdiv = document.getElementById('iteracoes')
-    let etapa = document.createElement('h2')
-    etapa.classList.add('mt-4')
-    etapa.appendChild( document.createTextNode('Iteração n. ' + cont) )
-    iteracoesdiv.appendChild(etapa)
-    iteracoesdiv.appendChild(htmltable)
-    let resp = relacionarVariaveisResultado(tabela)
-    
-  }
-  function showTable(t){
-    for( let value of t )
-      console.log(value);
-  }
-
-  /**
    * Usada para montar solução direta quando solicitado
    * @param {Array} tabela Tabela do simplex
    */
@@ -213,6 +192,7 @@
     iteracoesdiv.appendChild(title)
     iteracoesdiv.appendChild(htmltable)
     iteracoesdiv.appendChild(interpretacao)
+    iteracoesdiv.appendChild(document.createElement('hr'))
   }
 
   /**
